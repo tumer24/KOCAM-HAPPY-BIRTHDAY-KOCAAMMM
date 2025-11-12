@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Senin İçin</title>
+
+<style>
+@font-face {
+  font-family: "BreathRiver";
+  src: url("fonts/BreathOfTheRiver.ttf") format("truetype");
+}
+
+body {
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #ffd6e8, #d7eaff);
+  font-family: "BreathRiver", cursive;
+}
+
+#content {
+  max-width: 320px;
+  text-align: center;
+  font-size: 26px;
+  line-height: 1.3;
+  opacity: 0;
+  transition: opacity .5s;
+  min-height: 50px;
+  color: #333;
+}
+
+#content img {
+  width: 100%;
+  border-radius: 14px;
+  margin-bottom: 10px;
+}
+
+button {
+  border: none;
+  padding: 14px 26px;
+  border-radius: 14px;
+  font-size: 20px;
+  cursor: pointer;
+  background: rgba(255, 80, 110, .8);
+  color: white;
+  backdrop-filter: blur(20px);
+  font-family: inherit;
+  transition: transform .15s;
+}
+button:hover {
+  transform: scale(1.05);
+}
+
+.heart {
+  position: fixed;
+  font-size: 18px;
+  pointer-events: none;
+  animation: floatUp 1.2s ease-out forwards;
+}
+
+@keyframes floatUp {
+  from { transform: translateY(0) scale(1); opacity: 1; }
+  to   { transform: translateY(-80px) scale(.5); opacity: 0; }
+}
+
+#openingScreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #ffd6e8, #d7eaff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 1;
+  transition: opacity 0.8s ease-out;
+}
+
+#openingScreen.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#openingMessage {
+  font-size: 32px;
+  color: #333;
+  text-align: center;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+}
+
+#mainContent {
+  opacity: 0;
+  transition: opacity 0.8s ease-in;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  width: 100%;
+  height: 100vh;
+}
+
+#mainContent.show {
+  opacity: 1;
+}
+</style>
+</head>
+
+<body>
+
+<div id="openingScreen">
+  <div id="openingMessage">Sana Bir Sürprizim Vaarrr 💝</div>
+</div>
+
+<div id="mainContent">
+  <div id="content"></div>
+  <button id="nextBtn">💝</button>
+</div>
+
+<script>
+// Embedded data as fallback
+const embeddedItems = [
+    { "type":"text", "text":"seninle her an her şey hayatımın en mükemmel anlarından biri🫀" },
+    { "type":"text", "text":"gözlerine baktıkça içim huzurla doluyor🥰" },
+    { "type":"text", "text":"seni dünden çok yarından az seviyorum(yarın olsuun)🤭" },
+    { "type":"image", "img":"img/IMG_1170.jpeg", "text":"allahım tipini yirim çok yakışıklısın😍" },
+    { "type":"text", "text":"seni anneciğimiz benim için doğurmuş ben biraz beklettim ama kusuruma bakma😝" },
+    { "type":"image", "img":"img/IMG_2035.jpeg", "text":"ateşle su bizzikoo🫱🏻‍🫲🏼" },
+    { "type":"text", "text":"sen benim huzur bulduğum yerimsin🫠" },
+    { "type":"text", "text":"sana sarılınca dünyanın bütün kötülükleri yok oluyor🫂" },
+    { "type":"text", "text":"iyi ki doğmuşsun iyi ki birbirimizi bulmuşuz🥹" },
+    { "type":"image", "img":"img/IMG_6839.jpeg", "text":"birlikte çok güzelizzz💘" },
+    { "type":"text", "text":"birlikte daha bissürü mükemmel mutlu huzurlu günlerimiz olucak😌" },
+    { "type":"text", "text":"başıma gelen en ve tek güzel şeysin bitanem🫂" },
+    { "type":"image", "img":"img/IMG_2166.jpeg", "text":"bütün ömrümüz böyle birlikte geçecek hayatım ve anlamııımmm💗" },
+    { "type":"text", "text":"söz seni her daim seveceğim😚" },
+    { "type":"text", "text":"uyanınca ilk, uyurken son düşüncemsin💓" },
+    { "type":"image", "img":"img/kissing.jpg", "text":"ÇOK SEVİYORUM SENİ KOCAAMMMMMM💞" },
+    { "type":"text", "text":"bana bu kadar güzellikler yaşattığın için teşekkür ederim aşk bahçemmmm👩🏻‍❤️‍💋‍👨🏻" },
+    { "type":"text", "text":"iyi ki 1 sene önce bu doğum günü konusu açıldı da birbirimize yakınlaştık🥰" },
+    { "type":"image", "img":"img/IMG_6518.jpeg", "text":"ölürüm sanaaaaaaa🤤" },
+    { "type":"text", "text":"tek değerli varlığım sensiiinn kocaammmmm🫠" },
+    { "type":"text", "text":"varlığım varlığına armağan olsun yakışıklıımmmm🤭" },
+    { "type":"text", "text":"aklım fikrim her şeyim sensin🫂" },
+    { "type":"image", "img":"img/hugging.jpg", "text":"sonsuza kadar sarılalımmmm💞" },
+    { "type":"text", "text":"I WANNA BE YOURS🗣️(e zateenn aşkoooo🤭)" }
+];
+
+let items = [];
+
+async function loadData(){
+  try {
+    console.log("Attempting to load data from file...");
+    const res = await fetch("data/items.json");
+    console.log("Response status:", res.status, res.ok);
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+    const data = await res.json();
+    items = data;
+    console.log("Successfully loaded", items.length, "items from file");
+    return true;
+  } catch (error) {
+    console.warn("Could not load from file, using embedded data:", error.message);
+    // Use embedded data as fallback
+    items = embeddedItems;
+    console.log("Using embedded data,", items.length, "items");
+    return true;
+  }
+}
+
+function showItem(){
+  const cont = document.getElementById("content");
+  
+  if(items.length === 0) {
+    console.error("No items loaded!");
+    cont.innerHTML = "<div>Loading...</div>";
+    cont.style.opacity = 1;
+    return;
+  }
+  
+  // Select a random item
+  const randomIndex = Math.floor(Math.random() * items.length);
+  const it = items[randomIndex];
+
+  if(!it) {
+    console.error("Item is null at index:", randomIndex);
+    return;
+  }
+
+  console.log("Showing item:", it); // Debug log
+
+  if(it.type === "text"){
+    cont.innerHTML = `<div>${it.text}</div>`;
+  } else if(it.type === "image"){
+    cont.innerHTML = `
+      <img src="${it.img}" alt="" />
+      <div>${it.text}</div>
+    `;
+  } else {
+    console.error("Unknown item type:", it.type);
+    return;
+  }
+
+  // Ensure content is visible
+  cont.style.display = "block";
+  // Use requestAnimationFrame to ensure DOM is updated before changing opacity
+  requestAnimationFrame(() => {
+    cont.style.opacity = 1;
+    console.log("Content opacity set to 1, innerHTML length:", cont.innerHTML.length);
+  });
+}
+
+function hearts(){
+  for(let i=0; i<6; i++){
+    const h = document.createElement("div");
+    h.className = "heart";
+    h.style.left = (window.innerWidth/2 + (Math.random()*120-60))+"px";
+    h.style.top  = (window.innerHeight/2)+"px";
+    h.innerText = "💞";
+    document.body.appendChild(h);
+    setTimeout(()=>h.remove(),1200);
+  }
+}
+
+document.getElementById("nextBtn").addEventListener("click", ()=>{
+  console.log("Button clicked, items length:", items.length);
+  hearts();
+  showItem();
+});
+
+// Handle opening animation
+function startOpeningAnimation() {
+  const openingScreen = document.getElementById("openingScreen");
+  const mainContent = document.getElementById("mainContent");
+  
+  // After 2 seconds, fade out opening screen and show main content
+  setTimeout(() => {
+    openingScreen.classList.add("fade-out");
+    mainContent.classList.add("show");
+    
+    // Remove opening screen from DOM after fade completes
+    setTimeout(() => {
+      openingScreen.style.display = "none";
+    }, 800);
+  }, 2000);
+}
+
+// Start opening animation when page loads
+startOpeningAnimation();
+
+loadData().then((success) => {
+  console.log("Load data completed, success:", success, "items length:", items.length);
+  if(success && items.length > 0) {
+    console.log("Calling showItem on load");
+    // Wait for opening animation to complete before showing first item
+    setTimeout(() => {
+      showItem();
+    }, 2800);
+  } else {
+    console.error("Failed to load items or items array is empty");
+    const cont = document.getElementById("content");
+    setTimeout(() => {
+      cont.innerHTML = "<div>No items to display. Please check the console.</div>";
+      cont.style.opacity = 1;
+    }, 2800);
+  }
+});
+</script>
+
+</body>
+</html>
